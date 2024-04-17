@@ -60,7 +60,7 @@ end
 
 n, x, error = c - f(x)
 
-%% Three buses (slack, PV, PQ)
+%% Part 1 of Project: Three buses (slack, PV, PQ)
 % slack bus
 v1 = 1 % 1 per-unit (pu)
 theta1 = 0
@@ -133,6 +133,9 @@ d_p3_v3  = 2*g33*v3 + v1*(g31*cos(theta31) + b31*sin(theta31)) + v2*(g32*cos(the
 d_q3_th2 = v3*v2 * (-g32*cos(theta32) - b32*sin(theta32))
 d_q3_th3 = v3*v1 * (g31*cos(theta31) + b31*sin(theta31)) + v3*v2 * (g32*cos(theta32) + b32*sin(theta32))
 d_q3_v3  = -2*b33*v3 + v1 * (g31*sin(theta31) - b31*cos(theta31)) + v2 * (g32*sin(theta32) - b32*cos(theta32))
+
+% full Jacobian matrix
+J = [d_p2_th2, d_p2_th3, d_p2_v3; d_p3_th2, d_p3_th3, d_p3_v3; d_q3_th2, d_q3_th3, d_q3_v3]
 
 
 
