@@ -29,35 +29,63 @@ x = [theta2 ; theta3 ; V3 ; theta4];
 
 % define distance 
 D = 150;
+D2 = sqrt(2) * 150;
 
 % define the amount of busses
 
-n = 4;
+n = 0;
 
 % defining Z_12 before normalization by the base
 Z_12prebase = D*(0.037 + (j*0.376));
 
 Z_12 = Z_12prebase/Z_base;
+Z_23 = Z_12;
+Z_34 = Z_12;
+Z_14 = Z_12;
+
+Z_13 = 2* Z_12;
+Z_24 = Z_13;
+
+Z_42 = Z_24;
+
+Z_21 = Z_12;
+Z_31 = Z_13;
+Z_41 = Z_14;
+
+Z_32 = Z_23;
+
+Z_43 = Z_34;
+
+
+
 
 Y_kg = 0;
 summyIn = 2.*(1./Z_12);
-Y_km = (-1)./Z_12;
+Y_12 = (-1)./Z_12;
+Y_13 = (-1)./(Z_13);
+Y_14 = (-1)./(Z_14);
+
+Y_21 = (-1)./(Z_21);
+Y_23 = (-1)./(Z_23);
+Y_24 = (-1)./(Z_24);
+
+Y_31 = (-1)./(Z_13);
+Y_32 = (-1)./(Z_23);
+Y_34 = (-1)./(Z_34);
+
+Y_41 = (-1)./(Z_14);
+Y_42 = (-1)./(Z_24);
+Y_43 = (-1)./(Z_43);
+
+Y_11 = (1/Z_12) + (1/Z_13) + (1/Z_14);
+Y_22 = (1/Z_12) + (1/Z_23) + (1/Z_24); 
+Y_33 = (1/Z_13) + (1/Z_23) + (1/Z_34);
+Y_44 = (1/Z_14) + (1/Z_24) + (1/Z_34);
+
 Y_kk = Y_kg + summyIn;
 
-Y_admit = [Y_kk Y_km Y_km Y_km; Y_km Y_kk Y_km Y_km; Y_km Y_km Y_kk Y_km; Y_km Y_km Y_km Y_kk];
+Y_admit = [Y_11 Y_12 Y_13 Y_14; Y_21 Y_22 Y_23 Y_24; Y_31 Y_32 Y_33 Y_34; Y_41 Y_42 Y_43 Y_44];
 
-%imaginary portion of Y_km for susceptence
-G_km = real(Y_km);
-
-
-%real portion of Y_km for conductance
-B_km = imag(Y_km);
-
-% real portion of Y_kk for susceptence
-G_kk = real(Y_kk);
-
-% real portion of Y_kk for conductance
-B_kk = imag(Y_kk);
 
 %m = 0;
 G = real(Y_admit);
@@ -65,56 +93,56 @@ B = imag(Y_admit);
 
 
 
-j1 =@(x) -V2*(V1*cos(theta1 - x(1))*(B_km) - V2*cos(x(1) - x(2))*(B_km) - V3*cos(x(1) - x(2))*(B_km) + V1*sin(theta1 - x(1))*(G_km) + V2*sin(x(1) - x(2))*(G_km) + V3*sin(x(1) - x(4))*(G_km));
+j1 =@(x) -V2*(V1*cos(theta1 - x(1))*(B(1,2)) - V2*cos(x(1) - x(2))*(B(2,3)) - V3*cos(x(1) - x(2))*(B(2,3)) + V1*sin(theta1 - x(1))*(G(1,2)) + V2*sin(x(1) - x(2))*(G(2,3)) + V3*sin(x(1) - x(4))*(G(2,4)));
  
  
-j2 =@(x) -V2*(V2*cos(x(1) - x(2))*(B_km) - V2*sin(x(1) - x(2))*(G_km));
+j2 =@(x) -V2*(V2*cos(x(1) - x(2))*(B(2,3)) - V2*sin(x(1) - x(2))*(G(2,3)));
  
  
-j3 =@(x) V2*(cos(x(1) - x(4))*(G_km) + sin(x(1) - x(4))*(B_km));
+j3 =@(x) V2*(cos(x(1) - x(4))*(G(2,4)) + sin(x(1) - x(4))*(B(2,4)));
  
  
-j4 =@(x) -V2*(V3*cos(x(1) - x(4))*(B_km) - V3*sin(x(1) - x(4))*(G_km));
+j4 =@(x) -V2*(V3*cos(x(1) - x(4))*(B(2,4)) - V3*sin(x(1) - x(4))*(G(2,4)));
  
  
-j5 =@(x) V3*(V2*cos(x(1) - x(2))*(B_km) + V2*sin(x(1) - x(2))*(G_km));
+j5 =@(x) V3*(V2*cos(x(1) - x(2))*(B(3,2)) + V2*sin(x(1) - x(2))*(G(2,3)));
  
  
-j6 =@(x) -V3*(V1*cos(theta1 - x(2))*(B_km) + V2*cos(x(1) - x(2))*(B_km) - V3*cos(x(2) - x(4))*(B_km) + V1*sin(theta1 - x(2))*(G_km) + V2*sin(x(1) - x(2))*(G_km) + V3*sin(x(2) - x(4))*(G_km));
+j6 =@(x) -V3*(V1*cos(theta1 - x(2))*(B(3,1)) + V2*cos(x(1) - x(2))*(B(3,2)) - V3*cos(x(2) - x(4))*(B(3,4)) + V1*sin(theta1 - x(2))*(G(3,1)) + V2*sin(x(1) - x(2))*(G(3,2)) + V3*sin(x(2) - x(4))*(G(3,4)));
  
  
-j7 =@(x) V3*(cos(x(2) - x(4))*(G_km) + sin(x(2) - x(4))*(B_km)) + 2*G_kk*V3 - V1*cos(theta1 - x(2))*(G_km) - V2*cos(x(1) - x(2))*(G_km) + V3*cos(x(2) - x(4))*(G_km) + V1*sin(theta1 - x(2))*(B_km) + ...
-V2*sin(x(1) - x(2))*(B_km) + V3*sin(x(2) - x(4))*(B_km);
+j7 =@(x) V3*(cos(x(2) - x(4))*(G(3,4)) + sin(x(2) - x(4))*(B(3,4))) + 2*G(2,2)*V3 - V1*cos(theta1 - x(2))*(G(3,1)) - V2*cos(x(1) - x(2))*(G(3,2)) + V3*cos(x(2) - x(4))*(G(3,4)) + V1*sin(theta1 - x(2))*(B(3,1)) + ...
+V2*sin(x(1) - x(2))*(B(3,2)) + V3*sin(x(2) - x(4))*(B(3,4));
  
  
-j8 =@(x) -V3*(V3*cos(x(2) - x(4))*(B_km) - V3*sin(x(2) - x(4))*(G_km));
+j8 =@(x) -V3*(V3*cos(x(2) - x(4))*(B(3,4)) - V3*sin(x(2) - x(4))*(G(3,4)));
  
  
-j9 =@(x) V3*(V2*cos(x(1) - x(2))*(G_km) + V2*sin(x(1) - x(2))*(B_km));
+j9 =@(x) V3*(V2*cos(x(1) - x(2))*(G(3,2)) + V2*sin(x(1) - x(2))*(B(2,3)));
  
  
-j10 =@(x) -V3*(V1*cos(theta1 - x(2))*(G_km) + V2*cos(x(1) - x(2))*(G_km) - V3*cos(x(2) - x(3))*(G_km) + V1*sin(theta1 - x(3))*(B_km) + V2*sin(x(1) - x(2))*(B_km) + V3*sin(x(2) - x(4))*(B_km));
+j10 =@(x) -V3*(V1*cos(theta1 - x(2))*(G(1,3)) + V2*cos(x(1) - x(2))*(G(3,2)) - V3*cos(x(2) - x(3))*(G(3,2)) + V1*sin(theta1 - x(3))*(B(3,1)) + V2*sin(x(1) - x(2))*(B(2,3)) + V3*sin(x(2) - x(4))*(B(3,4)));
  
  
-j11 =@(x) V3*(cos(x(2) - x(4))*(B_km) + sin(x(2) - x(4))*(G_km)) + 2*B_kk*V3 - V1*cos(theta1 - x(2))*(B_km) - V2*cos(x(1) - x(2))*(B_km) + V3*cos(x(2) - x(4))*(B_km) + V1*sin(theta1 - x(2))*(G_km) + V2*sin(x(1) - x(2))*(G_km) + V3*sin(x(2) - x(4))*(G_km);
+j11 =@(x) V3*(cos(x(2) - x(4))*(B(3,4)) + sin(x(2) - x(4))*(G(3,4))) + 2*B(3,3)*V3 - V1*cos(theta1 - x(2))*(B(3,1)) - V2*cos(x(1) - x(2))*(B(3,2)) + V3*cos(x(2) - x(4))*(B(3,4)) + V1*sin(theta1 - x(2))*(G(1,3)) + V2*sin(x(1) - x(2))*(G(2,3)) + V3*sin(x(2) - x(4))*(G(3,4));
  
  
-j12 =@(x) -V3*(V3*cos(x(2) - x(4))*(G_km) - V3*sin(x(2) - x(4))*(B_km));
+j12 =@(x) -V3*(V3*cos(x(2) - x(4))*(G(3,4)) - V3*sin(x(2) - x(4))*(B(3,4)));
  
  
-j13 =@(x) V4*(V2*cos(x(1) - x(4))*(B_km) + V2*sin(x(1) - x(4))*(G_km));
+j13 =@(x) V4*(V2*cos(x(1) - x(4))*(B(2,4)) + V2*sin(x(1) - x(4))*(G(2,4)));
  
  
-j14 =@(x) V4*(V3*cos(x(2) - x(4))*(B_km) + V3*sin(x(2) - x(4))*(G_km));
+j14 =@(x) V4*(V3*cos(x(2) - x(4))*(B(3,4)) + V3*sin(x(2) - x(4))*(G(3,4)));
  
  
-j15 =@(x) -V4*(cos(x(2) - x(4))*(G_km) - sin(x(2) - x(4))*(B_km));
+j15 =@(x) -V4*(cos(x(2) - x(4))*(G(3,4)) - sin(x(2) - x(4))*(B(3,4)));
  
  
-j16 =@(x)-V4*(V1*cos(theta1 - x(4))*(B_km) + V2*cos(x(4) - x(1))*(B_km) + V3*cos(x(4) - x(2))*(B_km) + V1*sin(theta1 - x(4))*(G_km) + V2*sin(x(4) - x(1))*(G_km) + V3*sin(x(4) - x(2))*(G_km));
+j16 =@(x)-V4*(V1*cos(theta1 - x(4))*(B(4,1)) + V2*cos(x(4) - x(1))*(B(4,2)) + V3*cos(x(4) - x(2))*(B(4,3)) + V1*sin(theta1 - x(4))*(G(1,4)) + V2*sin(x(4) - x(1))*(G(2,4)) + V3*sin(x(4) - x(2))*(G(3,4)));
 
 P2 = @(x) ((G(2,2))*V2^2) + V2*(V1*(G(2,1))*cos(x(1) - theta1)+ V1*(B(2,1))*sin(x(1) - theta1) + V2*(G(2,3))*cos(x(2) - x(1)) + V2*(B(2,3))*sin(x(2) - x(1)) + V3*(G(2,4))*cos(x(4) - x(1)) + ...
-V3*(B(4,1))* sin(x(4) - x(1)));
+V3*(B(2,4))* sin(x(4) - x(1)));
 
 P3 = @(x) ((G(3,3))*V3^2) + V3*(V1*(G(3,1))*cos(x(2) - theta1)+ V1*(B(3,1))*sin(x(2) - theta1) + V2*(G(3,2))*cos(x(2) - x(1)) + V2*(B(3,2))*sin(x(2) - x(1)) + V3*(G(3,4))*cos(x(4) - x(2)) + ...
 V3*(B(3,4))* sin(x(4) - x(2)));
@@ -122,13 +150,13 @@ V3*(B(3,4))* sin(x(4) - x(2)));
 Q3 = @(x) ((B(3,3))*V3^2) + V3*(V1*(G(3,1))*sin(x(2) - theta1)- V1*(B(3,1))*cos(x(2) - theta1) + V2*(G(3,2))*sin(x(2) - x(1)) - V2*(B(3,2))*cos(x(2) - x(1)) + V3*(G(3,4))*sin(x(4) - x(2)) - ...
 V3*(B(3,4))* cos(x(4) - x(2))) ;
  
-P4 = @(x) (G(4,4) * V4^2) + V4*(V1*(G(4,1))*cos(x(4) - theta1) +V1*(B(4,1))*sin(x(4) - theta1)+ V2*(G(4,2))* cos(x(4)-x(1)) + V2*(B(4,2))*sin(x(4)-x(1)) + V3*(G(4,3))*cos(x(4)-x(2)) + V3*(B(4,3))*sin(x(4)-x(2))) ;
+P4 = @(x) (G(4,4) * V4^2) + V4*(V1*(G(4,1))*cos(x(4) - theta1) +V1*(B(4,1))*sin(x(4) - theta1)+ V2*(G(4,2))* cos(x(4)-x(1)) + V2*(B(4,1))*sin(x(4)-x(1)) + V3*(G(4,2))*cos(x(4)-x(2)) + V3*(B(4,2))*sin(x(4)-x(2))) ;
  
 funcMatrix2 = @(x) [P2(x); P3(x); Q3(x); P4(x)];
 
 
 
-while norm(c-funcMatrix2(x)) > esp
+while norm(c-funcMatrix2(x)) > ne
 JacobMatrix = [j1(x) j2(x) j3(x) j4(x);
 	           j5(x) j6(x) j7(x) j8(x);
 			   j9(x) j10(x) j11(x) j12(x);
@@ -141,10 +169,11 @@ delta_x(4) = wrapTo2Pi(delta_x(4));
 x = x + delta_x;
 
 ne = norm(esp);
-n = n+1;
+n = n+1
 end
 error = norm(c - funcMatrix2(x))
 n
 x
 c
 ne
+ 
