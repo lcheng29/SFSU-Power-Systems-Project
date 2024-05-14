@@ -108,6 +108,12 @@ x(3) * B(4,3) * cos(x(4) - x(2))); % reactive power of bus 4
 
 funcMatrix3 = @(x) [P2(x), P3(x), Q3(x), P4(x), Q4(x)].';
 
+% please make Jacobian matrix 
+% partial deriv. of P2 based on theta2, theta3, V3, theta4, V4
+% partial deriv. of P3 based on theta2, theta3, V3, theta4, V4
+% partial deriv. of Q3 based on theta2, theta3, V3, theta4, V4
+% partial deriv. of P4 based on theta2, theta3, V3, theta4, V4
+% partial deriv. of Q4 based on theta2, theta3, V3, theta4, V4
 %% Jacobian matrix
 
 % partial deriv. of P2 based on theta2, theta3, V3, theta4, V4
@@ -160,9 +166,9 @@ while norm(c-funcMatrix3(x)) > eps
     
     
     delta_x = inv(JacobMatrix) * (c-funcMatrix3(x)); % delta to approach tolerance
-    delta_x(1) = wrapTo2Pi(delta_x(1));
-    delta_x(2) = wrapTo2Pi(delta_x(2));
-    delta_x(4) = wrapTo2Pi(delta_x(4));
+    % delta_x(1) = wrapTo2Pi(delta_x(1));
+    % delta_x(2) = wrapTo2Pi(delta_x(2));
+    % delta_x(4) = wrapTo2Pi(delta_x(4));
     x = x + delta_x;
     
     n = n+1;
@@ -177,4 +183,3 @@ n
 x
 
  
-
