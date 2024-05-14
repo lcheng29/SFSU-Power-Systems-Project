@@ -11,7 +11,7 @@ V2 = 1.05;
 V4 = 0.95;
 
 %defining givens we have 
-esp = 1e-5;
+esp = 1e-3;
 ne=1.1*eps;     % So I can enter my while loop
 P2sp = 2;
 P3sp = 5;
@@ -84,85 +84,61 @@ Y_44 = (1/Z_14) + (1/Z_24) + (1/Z_34);
 
 Y_kk = Y_kg + summyIn;
 
-Y_admit = [Y_11 Y_12 Y_13 Y_14; Y_21 Y_22 Y_23 Y_24; Y_31 Y_32 Y_33 Y_34; Y_41 Y_42 Y_43 Y_44];
+Y_admit = [Y_11 Y_12 Y_13 Y_14; Y_21 Y_22 Y_23 Y_24; Y_31 Y_32 Y_33 Y_34; Y_41 Y_42 Y_43 Y_44]
 
 
 %m = 0;
 G = real(Y_admit);
 B = imag(Y_admit);
 
+% Define the Jacobian matrix elements
 
 
-j1 =@(x) -V2*(V1*cos(theta1 - x(1))*(B(1,2)) - V2*cos(x(1) - x(2))*(B(2,3)) - V3*cos(x(1) - x(2))*(B(2,3)) + V1*sin(theta1 - x(1))*(G(1,2)) + V2*sin(x(1) - x(2))*(G(2,3)) + V3*sin(x(1) - x(4))*(G(2,4)));
- 
- 
-j2 =@(x) -V2*(V2*cos(x(1) - x(2))*(B(2,3)) - V2*sin(x(1) - x(2))*(G(2,3)));
- 
- 
-j3 =@(x) V2*(cos(x(1) - x(4))*(G(2,4)) + sin(x(1) - x(4))*(B(2,4)));
- 
- 
-j4 =@(x) -V2*(V3*cos(x(1) - x(4))*(B(2,4)) - V3*sin(x(1) - x(4))*(G(2,4)));
- 
- 
-j5 =@(x) V3*(V2*cos(x(1) - x(2))*(B(3,2)) + V2*sin(x(1) - x(2))*(G(2,3)));
- 
- 
-j6 =@(x) -V3*(V1*cos(theta1 - x(2))*(B(3,1)) + V2*cos(x(1) - x(2))*(B(3,2)) - V3*cos(x(2) - x(4))*(B(3,4)) + V1*sin(theta1 - x(2))*(G(3,1)) + V2*sin(x(1) - x(2))*(G(3,2)) + V3*sin(x(2) - x(4))*(G(3,4)));
- 
- 
-j7 =@(x) V3*(cos(x(2) - x(4))*(G(3,4)) + sin(x(2) - x(4))*(B(3,4))) + 2*G(2,2)*V3 - V1*cos(theta1 - x(2))*(G(3,1)) - V2*cos(x(1) - x(2))*(G(3,2)) + V3*cos(x(2) - x(4))*(G(3,4)) + V1*sin(theta1 - x(2))*(B(3,1)) + ...
-V2*sin(x(1) - x(2))*(B(3,2)) + V3*sin(x(2) - x(4))*(B(3,4));
- 
- 
-j8 =@(x) -V3*(V3*cos(x(2) - x(4))*(B(3,4)) - V3*sin(x(2) - x(4))*(G(3,4)));
- 
- 
-j9 =@(x) V3*(V2*cos(x(1) - x(2))*(G(3,2)) + V2*sin(x(1) - x(2))*(B(2,3)));
- 
- 
-j10 =@(x) -V3*(V1*cos(theta1 - x(2))*(G(1,3)) + V2*cos(x(1) - x(2))*(G(3,2)) - V3*cos(x(2) - x(3))*(G(3,2)) + V1*sin(theta1 - x(3))*(B(3,1)) + V2*sin(x(1) - x(2))*(B(2,3)) + V3*sin(x(2) - x(4))*(B(3,4)));
- 
- 
-j11 =@(x) V3*(cos(x(2) - x(4))*(B(3,4)) + sin(x(2) - x(4))*(G(3,4))) + 2*B(3,3)*V3 - V1*cos(theta1 - x(2))*(B(3,1)) - V2*cos(x(1) - x(2))*(B(3,2)) + V3*cos(x(2) - x(4))*(B(3,4)) + V1*sin(theta1 - x(2))*(G(1,3)) + V2*sin(x(1) - x(2))*(G(2,3)) + V3*sin(x(2) - x(4))*(G(3,4));
- 
- 
-j12 =@(x) -V3*(V3*cos(x(2) - x(4))*(G(3,4)) - V3*sin(x(2) - x(4))*(B(3,4)));
- 
- 
-j13 =@(x) V4*(V2*cos(x(1) - x(4))*(B(2,4)) + V2*sin(x(1) - x(4))*(G(2,4)));
- 
- 
-j14 =@(x) V4*(V3*cos(x(2) - x(4))*(B(3,4)) + V3*sin(x(2) - x(4))*(G(3,4)));
- 
- 
-j15 =@(x) -V4*(cos(x(2) - x(4))*(G(3,4)) - sin(x(2) - x(4))*(B(3,4)));
- 
- 
-j16 =@(x)-V4*(V1*cos(theta1 - x(4))*(B(4,1)) + V2*cos(x(4) - x(1))*(B(4,2)) + V3*cos(x(4) - x(2))*(B(4,3)) + V1*sin(theta1 - x(4))*(G(1,4)) + V2*sin(x(4) - x(1))*(G(2,4)) + V3*sin(x(4) - x(2))*(G(3,4)));
+% Partial derivatives of P2 with respect to theta2, theta3, V3, and theta4
+j1= @(x) -V2 * (V1 * cos(theta1 - theta2) * B(2, 1) - V2 * cos(theta1 - theta2) * B(2, 3) - V3 * cos(theta2 - theta4) * B(2, 4) + V1 * sin(theta1 - theta2) * G(2, 1) + V2 * sin(theta2 - theta3) * G(2, 3) + V3 * sin(theta2 - theta4) * G(2, 4));
+j2 =@(x) V2^2 * sin(theta2 - theta3) * G(2, 3);
+j3 =@(x) V2 * (sin(theta2 - theta4) * G(2, 4) - cos(theta2 - theta4) * B(2, 4));
+j4 =@(x) -V2 * (V3 * cos(theta2 - theta4) * B(2, 4) - V3 * sin(theta2 - theta4) * G(2, 4));
 
-P2 = @(x) ((G(2,2))*V2^2) + V2*(V1*(G(2,1))*cos(x(1) - theta1)+ V1*(B(2,1))*sin(x(1) - theta1) + V2*(G(2,3))*cos(x(2) - x(1)) + V2*(B(2,3))*sin(x(2) - x(1)) + V3*(G(2,4))*cos(x(4) - x(1)) + ...
-V3*(B(2,4))* sin(x(4) - x(1)));
+% Partial derivatives of P3 with respect to theta2, theta3, V3, and theta4
+j5 =@(x) V3^2 * (G(3, 2) * cos(theta3 - theta2) + B(3, 2) * sin(theta3 - theta2)) + V3 * (V1 * cos(theta1 - theta2) * G(3, 1) - V1 * sin(theta1 - theta2) * B(3, 1) + V2 * cos(theta2 - theta3) * G(3, 2) - V2 * sin(theta2 - theta3) * B(3, 2) + V3 * cos(theta3 - theta4) * G(3, 4) + V3 * sin(theta3 - theta4) * B(3, 4));
+j6 =@(x) V3^2 * (-G(3, 2) * cos(theta3 - theta2) + B(3, 2) * sin(theta3 - theta2)) + V3 * (-V1 * cos(theta1 - theta2) * G(3, 1) + V1 * sin(theta1 - theta2) * B(3, 1) - V2 * cos(theta2 - theta3) * G(3, 2) + V2 * sin(theta2 - theta3) * B(3, 2) + V3 * cos(theta3 - theta4) * G(3, 4) + V3 * sin(theta3 - theta4) * B(3, 4));
+j7 =@(x) 2 * V3 * (G(3, 3) * V3 + B(3, 3) * V3) + (V1 * cos(theta1 - theta2) * G(3, 1) - V1 * sin(theta1 - theta2) * B(3, 1) + V2 * cos(theta2 - theta3) * G(3, 2) - V2 * sin(theta2 - theta3) * B(3, 2) + V3 * cos(theta3 - theta4) * G(3, 4) + V3 * sin(theta3 - theta4) * B(3, 4));
+j8 =@(x) V3^2 * (G(3, 4) * cos(theta3 - theta4) + B(3, 4) * sin(theta3 - theta4)) + V3 * (G(3, 3) * V3 + B(3, 3) * V3);
 
-P3 = @(x) ((G(3,3))*V3^2) + V3*(V1*(G(3,1))*cos(x(2) - theta1)+ V1*(B(3,1))*sin(x(2) - theta1) + V2*(G(3,2))*cos(x(2) - x(1)) + V2*(B(3,2))*sin(x(2) - x(1)) + V3*(G(3,4))*cos(x(4) - x(2)) + ...
-V3*(B(3,4))* sin(x(4) - x(2)));
+% Partial derivatives of Q with respect to theta2, theta3, V3, and theta4
+j9 =@(x) V3^2 * (-B(3, 2) * cos(theta3 - theta2) - G(3, 2) * sin(theta3 - theta2)) + V3 * (-V1 * sin(theta1 - theta2) * G(3, 1) - V1 * cos(theta1 - theta2) * B(3, 1) - V2 * sin(theta2 - theta3) * G(3, 2) - V2 * cos(theta2 - theta3) * B(3, 2) - V3 * sin(theta3 - theta4) * G(3, 4) + V3 * cos(theta3 - theta4) * B(3, 4));
+j10=@(x) V3^2 * (B(3, 2) * cos(theta3 - theta2) + G(3, 2) * sin(theta3 - theta2)) + V3 * (V1 * sin(theta1 - theta2) * G(3, 1) - V1 * cos(theta1 - theta2) * B(3, 1) + V2 * sin(theta2 - theta3) * G(3, 2) - V2 * cos(theta2 - theta3) * B(3, 2) - V3 * sin(theta3 - theta4) * G(3, 4) + V3 * cos(theta3 - theta4) * B(3, 4));
+j11 =@(x) 2 * V3 * (-G(3, 3) * V3 + B(3, 3) * V3) + (-V1 * sin(theta1 - theta2) * G(3, 1) - V1 * cos(theta1 - theta2) * B(3, 1) - V2 * sin(theta2 - theta3) * G(3, 2) - V2 * cos(theta2 - theta3) * B(3, 2) - V3 * sin(theta3 - theta4) * G(3, 4) + V3 * cos(theta3 - theta4) * B(3, 4));
+j12 =@(x) V3^2 * (-G(3, 4) * cos(theta3 - theta4) - B(3, 4) * sin(theta3 - theta4)) + V3 * (-G(3, 3) * V3 + B(3, 3) * V3);
 
-Q3 = @(x) ((B(3,3))*V3^2) + V3*(V1*(G(3,1))*sin(x(2) - theta1)- V1*(B(3,1))*cos(x(2) - theta1) + V2*(G(3,2))*sin(x(2) - x(1)) - V2*(B(3,2))*cos(x(2) - x(1)) + V3*(G(3,4))*sin(x(4) - x(2)) - ...
-V3*(B(3,4))* cos(x(4) - x(2))) ;
+% Partial derivatives of P4 with respect to theta2, theta3, V3, and theta4
+j13 =@(x) -V4 * (V1 * cos(theta1 - theta4) * B(4, 1) - V1 * sin(theta1 - theta4) * G(4, 1) + V2 * cos(theta2 - theta4) * G(4, 2) - V2 * sin(theta2 - theta4) * B(4, 2) + V3 * cos(theta3 - theta4) * G(4, 3) - V3 * sin(theta3 - theta4) * B(4, 3));
+j14 =@(x) -V4 * (V3 * cos(theta3 - theta4) * G(4, 3) - V3 * sin(theta3 - theta4) * B(4, 3));
+j15 =@(x) V4 * (sin(theta3 - theta4) * B(4, 3) - cos(theta3 - theta4) * G(4, 3));
+j16 =@(x) -V4 * (V3 * cos(theta3 - theta4) * B(4, 3) - V3 * sin(theta3 - theta4) * G(4, 3));
+
+
+
+
+P2 = @(x) ((G(2,2))*V2^2) + V2*(V1*(G(2,1))*cos(x(1) - theta1)+ V1*(B(2,1))*sin(x(1) - theta1) + V3*(G(2,3))*cos(x(2) - x(1)) + V3*(B(2,3))*sin(x(2) - x(1)) + V4*(G(2,4))*cos(x(4) - x(1)) + ...
+V4*(B(2,4))* sin(x(4) - x(1)));
+
+P3 = @(x) ((G(3,3))*x(3)^2) + x(3)*(V1*(G(3,1))*cos(x(2) - theta1)+ V1*(B(3,1))*sin(x(2) - theta1) + V2*(G(3,2))*cos(x(2) - x(1)) + V2*(B(3,2))*sin(x(2) - x(1)) + V4*(G(3,4))*cos(x(4) - x(2)) + ...
+V4*(B(3,4))* sin(x(4) - x(2)));
+
+Q3 = @(x) ((B(3,3))*x(3)^2) + x(3)*(V1*(G(3,1))*sin(x(2) - theta1)- V1*(B(3,1))*cos(x(2) - theta1) + V2*(G(3,2))*sin(x(2) - x(1)) - V2*(B(3,2))*cos(x(2) - x(1)) + V4*(G(3,4))*sin(x(4) - x(2)) - ...
+V4*(B(3,4))* cos(x(4) - x(2))) ;
  
-P4 = @(x) (G(4,4) * V4^2) + V4*(V1*(G(4,1))*cos(x(4) - theta1) +V1*(B(4,1))*sin(x(4) - theta1)+ V2*(G(4,2))* cos(x(4)-x(1)) + V2*(B(4,1))*sin(x(4)-x(1)) + V3*(G(4,2))*cos(x(4)-x(2)) + V3*(B(4,2))*sin(x(4)-x(2))) ;
+P4 = @(x) (G(4,4) * V4^2) + V4*(V1*(G(4,1))*cos(x(4) - theta1) +V1*(B(4,1))*sin(x(4) - theta1)+ V2*(G(4,2))* cos(x(4)-x(1)) + V2*(B(4,1))*sin(x(4)-x(1)) + x(3)*(G(4,2))*cos(x(4)-x(2)) + x(3)*(B(4,2))*sin(x(4)-x(2))) ;
  
 funcMatrix2 = @(x) [P2(x); P3(x); Q3(x); P4(x)];
 
 
+while norm(c-funcMatrix2(x)) > esp
+JacobianMatrix = [j1(x) j2(x) j3(x) j4(x); j5(x) j6(x) j7(x) j8(x); j9(x) j10(x) j11(x) j12(x); j13(x) j14(x) j15(x) j16(x)];
 
-while norm(c-funcMatrix2(x)) > ne
-JacobMatrix = [j1(x) j2(x) j3(x) j4(x);
-	           j5(x) j6(x) j7(x) j8(x);
-			   j9(x) j10(x) j11(x) j12(x);
-			   j13(x) j14(x) j15(x) j16(x)];
-
-delta_x = inv(JacobMatrix)*(c-funcMatrix2(x)); % delta to approach tolerance
+delta_x = inv(JacobianMatrix)*(c-funcMatrix2(x)) % delta to approach tolerance
 delta_x(1) = wrapTo2Pi(delta_x(1));
 delta_x(2) = wrapTo2Pi(delta_x(2));
 delta_x(4) = wrapTo2Pi(delta_x(4));
@@ -171,9 +147,8 @@ x = x + delta_x;
 ne = norm(esp);
 n = n+1
 end
-error = norm(c - funcMatrix2(x))
+error = norm(c - funcMatrix2(x));
 n
 x
 c
 ne
- 
